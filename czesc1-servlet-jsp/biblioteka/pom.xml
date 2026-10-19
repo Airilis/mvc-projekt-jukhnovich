@@ -16,7 +16,7 @@
     </properties>
 
     <dependencies>
-        <!-- Servlet API – dostarcza je Tomcat, dlatego scope "provided" -->
+        <!-- Servlet API – doarstcza je Tomcat, dlatego scope "provided" -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
