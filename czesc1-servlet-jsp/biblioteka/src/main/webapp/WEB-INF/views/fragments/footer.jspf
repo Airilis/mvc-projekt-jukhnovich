@@ -1,0 +1,10 @@
+
+<%@ page pageEncoding="UTF-8" %>
+</main>
+<footer>
+    <%-- komentarz JSP: nie trafia do HTML wysłanego do przeglądarki --%>
+    <!-- komentarz HTML: widoczny w źródle strony -->
+    <p>Dodane w tej sesji: ${empty sessionScope.addedCount ? 0 : sessionScope.addedCount}</p>
+</footer>
+</body>
+</html>

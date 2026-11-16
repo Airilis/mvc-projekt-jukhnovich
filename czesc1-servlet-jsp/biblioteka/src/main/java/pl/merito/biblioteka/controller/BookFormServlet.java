@@ -1,88 +1,68 @@
 
 package pl.merito.biblioteka.controller;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.Year;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @WebServlet("/books/add")
 public class BookFormServlet extends HttpServlet {
 
+    private static final String VIEW = "/WEB-INF/views/books/form.jsp";
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
-        renderForm(resp, new ArrayList<>(), "", "", "");
+            throws ServletException, IOException {
+        req.getRequestDispatcher(VIEW).forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
+            throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
-
-        String title = trim(req.getParameter("title"));
-        String author = trim(req.getParameter("author"));
-        String year = trim(req.getParameter("year"));
-
-        List<String> errors = new ArrayList<>();
-
-        if (title.isEmpty()) {
-            errors.add("Tytuł jest wymagany.");
-        }
-
-        if (author.isEmpty()) {
-            errors.add("Autor jest wymagany.");
-        }
-
-        try {
-            int y = Integer.parseInt(year);
-            int now = Year.now().getValue();
-
-            if (y < 1450 || y > now) {
-                errors.add("Rok musi mieścić się w zakresie 1450–" + now + ".");
-            }
-        } catch (NumberFormatException e) {
-            errors.add("Rok wydania musi być liczbą.");
-        }
+        Map<String, String> errors = validate(req);
 
         if (!errors.isEmpty()) {
-            renderForm(resp, errors, title, author, year);
+            req.setAttribute("errors", errors);
+            req.getRequestDispatcher(VIEW).forward(req, resp);
             return;
         }
 
-        String encoded = URLEncoder.encode(title, StandardCharsets.UTF_8);
-        resp.sendRedirect(req.getContextPath() + "/books/added?title=" + encoded);
+        HttpSession session = req.getSession();
+        Integer added = (Integer) session.getAttribute("addedCount");
+        session.setAttribute("addedCount", added == null ? 1 : added + 1);
+        session.setAttribute("lastTitle", req.getParameter("title"));
+
+        resp.sendRedirect(req.getContextPath() + "/books/added");
     }
 
-    private String trim(String value) {
-        return value == null ? "" : value.trim();
-    }
+    private Map<String, String> validate(HttpServletRequest req) {
+        Map<String, String> errors = new HashMap<>();
+        String title = req.getParameter("title");
+        String author = req.getParameter("author");
 
-    private void renderForm(HttpServletResponse resp, List<String> errors,
-                            String title, String author, String year)
-            throws IOException {
+        if (title == null || title.isBlank())
+            errors.put("title", "Tytuł jest wymagany.");
 
-        resp.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = resp.getWriter();
+        if (author == null || author.isBlank())
+            errors.put("author", "Autor jest wymagany.");
 
-        out.println("<!DOCTYPE html><html><body><h1>Dodaj książkę</h1>");
-
-        for (String error : errors) {
-            out.println("<p style='color:red'>" + error + "</p>");
+        try {
+            int year = Integer.parseInt(req.getParameter("year"));
+            if (year < 1450 || year > Year.now().getValue())
+                errors.put("year", "Nieprawidłowy rok.");
+        } catch (NumberFormatException e) {
+            errors.put("year", "Rok wydania musi być liczbą.");
         }
 
-        out.println("<form method='post'>");
-        out.println("<p>Tytuł: <input name='title' value='" + title + "'></p>");
-        out.println("<p>Autor: <input name='author' value='" + author + "'></p>");
-        out.println("<p>Rok wydania: <input name='year' value='" + year + "'></p>");
-        out.println("<button type='submit'>Zapisz</button></form></body></html>");
+        return errors;
     }
 }

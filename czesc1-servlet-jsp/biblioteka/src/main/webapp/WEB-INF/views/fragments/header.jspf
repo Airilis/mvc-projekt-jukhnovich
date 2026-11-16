@@ -1,0 +1,18 @@
+
+<%@ page pageEncoding="UTF-8" %>
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Biblioteka</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+</head>
+<body>
+<header>
+    <h1>Biblioteka</h1>
+    <nav>
+        <a href="${pageContext.request.contextPath}/">Start</a>
+        <a href="${pageContext.request.contextPath}/books/add">Dodaj książkę</a>
+    </nav>
+</header>
+<main>
