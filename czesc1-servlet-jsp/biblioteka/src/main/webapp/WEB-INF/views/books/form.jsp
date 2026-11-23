@@ -1,28 +1,44 @@
 
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
-<%-- Formularz dodawania książki: wartości i błędy pobierane przez EL --%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ include file="/WEB-INF/views/fragments/header.jspf" %>
 
 <h2>Dodaj książkę</h2>
+
 <form method="post" action="${pageContext.request.contextPath}/books/add">
-    <label>Tytuł
+
+    <label>
+        Tytuł
         <input name="title" value="${param.title}">
     </label>
+
     <span class="error">${errors.title}</span>
 
-    <label>Autor
-        <input name="author" value="${param.author}">
-    </label>
-    <span class="error">${errors.author}</span>
+    <label>
+        Autor
+        <select name="authorId">
+            <option value="">-- wybierz --</option>
 
-    <label>Rok wydania
+            <c:forEach items="${authors}" var="a">
+                <option value="${a.id}"
+                    ${param.authorId == a.id ? 'selected' : ''}>
+                    ${a.name}
+                </option>
+            </c:forEach>
+        </select>
+    </label>
+
+    <span class="error">${errors.authorId}</span>
+
+    <label>
+        Rok wydania
         <input name="year" value="${param.year}">
     </label>
+
     <span class="error">${errors.year}</span>
 
     <button type="submit">Zapisz</button>
-</form>
 
-<p>Liczba błędów: ${empty errors ? 0 : errors.size()}</p>
+</form>
 
 <%@ include file="/WEB-INF/views/fragments/footer.jspf" %>

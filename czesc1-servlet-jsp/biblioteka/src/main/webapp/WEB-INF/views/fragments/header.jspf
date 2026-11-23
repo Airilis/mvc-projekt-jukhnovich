@@ -13,6 +13,7 @@
     <nav>
         <a href="${pageContext.request.contextPath}/">Start</a>
         <a href="${pageContext.request.contextPath}/books/add">Dodaj książkę</a>
+        <a href="${pageContext.request.contextPath}/books">Książki</a>
     </nav>
 </header>
 <main>
